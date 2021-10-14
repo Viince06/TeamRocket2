@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+
+  server:
+    image: 7wonders/server:0.1
+    container_name: Server
+    ports:
+      - "8080:8080"
+    environment:
+      - STATS_HOST=Stats
+      - STATS_PORT=8080
+      - GAME_MAXQUEUESIZE=3
+    networks:
+      - 7wonders_network
+
+  stats:
+    image: 7wonders/stats:0.1
+    container_name: Stats
+    ports:
+      - "8081:8080"
+    networks:
+      - 7wonders_network
+
+  player:
+    image: 7wonders/player:0.1
+    #container_name: Player
+    networks:
+      - 7wonders_network
+    environment:
+      - GAME_HOST=Server
+      - GAME_PORT=8080
+    ports :
+      - "8092-8094:8079"
+    depends_on:
+      - server
+
+
+networks:
+  7wonders_network:

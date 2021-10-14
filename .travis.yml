@@ -1,0 +1,29 @@
+language: java
+
+branches:
+  only:
+    - master
+    - /^release\/.*$/
+
+jdk:
+  - openjdk11
+services:
+  - docker
+install:
+  - mvn clean install
+
+script:
+  - docker build -t 7wonders/server:0.1 Server
+  - docker build -t 7wonders/stats:0.1 Stats
+  - docker build -t 7wonders/player:0.1 Player
+  - docker-compose up --scale player=3 -d
+  - sleep 45
+  - curl http://localhost:8092/register
+  - curl http://localhost:8092/join
+  - curl http://localhost:8093/register
+  - curl http://localhost:8093/join
+  - curl http://localhost:8094/register
+  - curl http://localhost:8094/join
+  - sleep 15
+  - docker logs Server
+  - docker-compose down
